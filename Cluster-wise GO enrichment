@@ -1,0 +1,18 @@
+cwutility <- function(i){
+  ego <- enrichGO(gene = unlist(str_split(df$tair[df$cluster_fg == clusters[i]], ";")), 
+                  keyType = "TAIR",ont = "BP", OrgDb = org.At.tair.db) %>% as_tibble() %>% 
+    mutate(cluster = clusters[i])
+  return(ego)
+}
+
+cluster.wise.ego <- function(x){
+  df <- as_data_frame(x, "vertices")
+  clusters <- levels(as.factor(df$cluster_fg))
+  library(parabar)
+  backend <- start_backend(cores = 3, cluster_type = "psock", backend_type = "async")
+  evaluate(backend, expression = {library(org.At.tair.db);library(clusterProfiler);library(tidyverse)})
+  export(backend, variables = c("df", "clusters", "cwutility"), environment = environment())
+  result <- par_lapply(backend, x = seq_along(clusters), fun = cwutility)
+  result <- do.call(rbind,result)
+  return(result)
+}
