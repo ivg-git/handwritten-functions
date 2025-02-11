@@ -1,0 +1,35 @@
+dms_to_decimal <- function(dms_string) {
+  
+  parts <- strsplit(dms_string, "[°'\" ]")[[1]]
+  degreeslo <- as.numeric(parts[1])
+  minuteslo <- as.numeric(parts[2])
+  secondslo <- as.numeric(parts[3])
+  directionlo <- parts[4]
+  
+  
+  decimal_degreeslo <- degreeslo + minuteslo / 60 + secondslo / 3600
+  
+  if (directionlo == "S") {
+    decimal_degreeslo <- -decimal_degreeslo
+  }
+  
+  degreesla <- as.numeric(parts[5])
+  minutesla <- as.numeric(parts[6])
+  secondsla <- as.numeric( parts[7])
+  directionla <- parts[8]
+  
+  
+  decimal_degreesla <- degreesla + minutesla / 60 + secondsla / 3600
+  
+  if (directionla == "W") {
+    decimal_degreesla <- -decimal_degreesla
+  }
+  
+  df <- data.frame(lon = decimal_degreeslo, lat = decimal_degreesla)
+  return(df)
+}
+
+rl <- list()
+for(i in 1:nrow(popdf)){
+rl[[i]] <-    dms_to_decimal(popdf$meta[i])
+}
