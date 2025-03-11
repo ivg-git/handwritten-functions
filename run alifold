@@ -1,0 +1,8 @@
+#input is a list of alignments DNAStringSets
+alifolds <- list()
+for(i in seq_along(input)){
+writeXStringSet(input[[i]], "temp.fa")
+temp <- system("\"C:/Program Files (x86)/ViennaRNA Package/RNAalifold.exe\" -f F \"temp.fa\" -T 20.0", intern = T)
+alifolds[[i]] <- temp
+cat(paste("iteration ", i), "\r")
+}
