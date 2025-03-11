@@ -1,0 +1,9 @@
+#using MUSCLE for multiple sequence alignment
+align_muscle <- function(x){
+  writeXStringSet(x, "temp.fa")
+  system("muscle-win64.v5.3.exe -align temp.fa -output alignment.afa")
+  temp <- readDNAStringSet("alignment.afa")
+  file.remove("temp.fa")
+  file.remove("alignment.afa")
+  return(temp)
+}
