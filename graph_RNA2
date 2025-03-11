@@ -1,0 +1,19 @@
+# using ggraph for RNA secondary structure plots
+graph_RNA2 <- function(primary, secondary){
+  library(RRNA)
+library(igraph)
+library(ggraph)
+  ct <- makeCt(struct = secondary, seq = primary)
+  gda <- data.frame(ct[,5:6]) %>% filter(bound!=0)
+  gdb <- data.frame(pos2 = c(1:(nrow(ct)-1)), bound = c(2:nrow(ct)))
+  
+  g <- graph_from_data_frame(rbind(gda,gdb), directed = F)
+  g <- igraph::simplify(g)
+  V(g)$label <- ct$seq
+  p <- ggraph(g, "backbone")+
+    geom_edge_link(colour = "darkgrey", alpha = 0.8, start_cap = circle(0.1), end_cap = circle(0.1))+
+    geom_node_point()+
+    theme_graph(base_family = "sans")
+  print(p)
+  return(p)
+}
