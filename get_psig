@@ -1,0 +1,13 @@
+#input p.values and get the "*"
+get_psig <- function(p.value){
+  temp <- data.frame(p.value = p.value)
+  temp$p.sig <- NA_character_
+for(i in 1:nrow(temp)){
+  if(temp$p.value[i] > 0.05) {temp$p.sig[i] = "ns"
+  } else if (temp$p.value[i] < 0.05 & temp$p.value[i] >= 0.01 ) {temp$p.sig[i] = "*"
+  } else if (temp$p.value[i] < 0.01 & temp$p.value[i] >= 0.001 ) {temp$p.sig[i] = "**"
+  } else if (temp$p.value[i] < 0.001 & temp$p.value[i] >= 0.0001 ) {temp$p.sig[i] = "***"
+  } else if (temp$p.value[i] < 0.0001 ) {temp$p.sig[i] = "****"}}
+  
+  return(temp$p.sig)
+  }
