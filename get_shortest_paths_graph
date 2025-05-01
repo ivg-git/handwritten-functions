@@ -1,0 +1,20 @@
+#use only for MST!
+get_shortest_paths_graph <- function(g, vertices){
+  df <- expand.grid(vertices, vertices)
+  library(tidyverse)
+  df2 <- df %>% filter(df$Var1 != df$Var2)
+  
+  df2$Var1 <- as.character(df2$Var1)
+  df2$Var2 <- as.character(df2$Var2)
+  
+  reslist <- list()
+  for(i in 1:nrow(df2)){
+    test <- all_shortest_paths(g, from = V(g)[V(g)$name == df2$Var1[i] ], to = V(g)[V(g)$name == df2$Var2[i]])
+    
+    subg <- subgraph(g, V(g)[as.vector(test$vpaths[[1]])])
+    reslist[[i]] <- igraph::as_data_frame(subg)}
+  
+  rdf <- do.call(rbind, reslist)
+  rg <- graph_from_data_frame(rdf, directed = F)
+  return(rg)
+  }
