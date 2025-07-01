@@ -1,0 +1,62 @@
+#include <Rcpp.h>
+#include <map>
+#include <string>
+
+using namespace Rcpp;
+
+bool isTransition(char a, char b) {
+  a = toupper(a);
+  b = toupper(b);
+  
+  if ((a == 'A' && b == 'G') || (a == 'G' && b == 'A')) return true;
+  if ((a == 'C' && b == 'T') || (a == 'T' && b == 'C')) return true;
+  
+  return false;
+}
+
+bool isTransversion(char a, char b) {
+  a = toupper(a);
+  b = toupper(b);
+  
+  if (a == 'N' || b == 'N' || a == '-' || b == '-' || a == ' ' || b == ' ') return false;
+  if (a != b && !isTransition(a, b)) return true;
+  
+  return false;
+}
+
+// [[Rcpp::export]]
+List calculateTiTv(CharacterMatrix alignment) {
+  int n_seqs = alignment.nrow();
+  int n_sites = alignment.ncol();
+  
+  if (n_seqs < 2) {
+    stop("Alignment must contain at least 2 sequences");
+  }
+  
+  int transitions = 0;
+  int transversions = 0;
+  
+  for (int j = 0; j < n_sites; ++j) {
+    for (int i = 0; i < n_seqs - 1; ++i) {
+      for (int k = i + 1; k < n_seqs; ++k) {
+        // Явное преобразование прокси-объекта в char
+        char a = as<char>(alignment(i, j));
+        char b = as<char>(alignment(k, j));
+        
+        if (isTransition(a, b)) {
+          transitions++;
+        } else if (isTransversion(a, b)) {
+          transversions++;
+        }
+      }
+    }
+  }
+  
+  double ratio = (transversions == 0) ? NA_REAL : (double)transitions / transversions;
+  
+  return List::create(
+    Named("transitions") = transitions,
+    Named("transversions") = transversions,
+    Named("ratio") = ratio
+  );
+}
